@@ -25,16 +25,21 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    // 在try块开始处添加ID验证和转换
     const { id, ip } = JSON.parse(event.body);
     
+    // 验证ID格式
     if (!id || !ip) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'ID and IP are required' })
+        body: JSON.stringify({ error: 'ID和IP是必需的参数' })
       };
     }
 
+    // 尝试将ID转换为数字（如果数据库使用整数ID）
+    const messageId = isNaN(Number(id)) ? id : Number(id);
+    
     // 首先检查这条留言是否存在且IP匹配
     const { data: message, error: fetchError } = await supabase
       .from('guestbook')
