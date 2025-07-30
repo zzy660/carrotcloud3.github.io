@@ -482,6 +482,7 @@ const sidebarLinks = document.querySelectorAll('.sidebar a');
 						<div class="message-content">${window.escapeHtml(message.content)}</div>
 						<div class="message-footer">
 							<span>来自IP: ${message.ip}</span>
+							${message.ip === window.getClientIP() ? `<button class="delete-btn" onclick="window.deleteMessage('${message.id}')">删除</button>` : ''}
 						</div>
 					</div>
 				`;
@@ -494,7 +495,35 @@ const sidebarLinks = document.querySelectorAll('.sidebar a');
 		}
 	};
 
+	window.deleteMessage = async function(id) {
+		if (!confirm('确定要删除这条留言吗？')) {
+			return;
+		}
 
+		try {
+			const response = await fetch('/.netlify/functions/deleteGuestbook', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					id: id,
+					ip: window.getClientIP()
+				})
+			});
+
+			if (response.ok) {
+				alert('留言删除成功！');
+				window.loadMessages();
+			} else {
+				const error = await response.json();
+				alert('删除失败: ' + (error.error || '未知错误'));
+			}
+		} catch (error) {
+			console.error('删除留言失败:', error);
+			alert('删除留言失败，请重试');
+		}
+	};
 
 	// 表单提交事件处理
 	window.submitMessage = async function() {
@@ -548,7 +577,7 @@ const sidebarLinks = document.querySelectorAll('.sidebar a');
 		// 检查是否已留言
 		const hasCommented = await window.hasIPCommented(clientIP);
 		if (hasCommented) {
-			messageStatus.innerHTML = '<span style="color: #e74c3c;">每个人只能留言一次！</span>';
+			messageStatus.innerHTML = '<span style="color: #e74c3c;">每个人只能留言一次！您可以删除之前的留言后重新留言。</span>';
 			return;
 		}
 

@@ -65,7 +65,38 @@ app.post('/api/messages', async (req, res) => {
     }
 });
 
-
+// 删除留言
+app.delete('/api/messages/:index', async (req, res) => {
+    try {
+        const index = parseInt(req.params.index);
+        const { ip } = req.body;
+        
+        let messages = [];
+        try {
+            const data = await fs.readFile(DATA_FILE, 'utf8');
+            messages = JSON.parse(data || '[]');
+        } catch (error) {
+            messages = [];
+        }
+        
+        if (index < 0 || index >= messages.length) {
+            return res.status(404).json({ error: '留言不存在' });
+        }
+        
+        // 检查IP是否匹配（只允许删除自己的留言）
+        if (messages[index].ip !== ip) {
+            return res.status(403).json({ error: '无权限删除此留言' });
+        }
+        
+        messages.splice(index, 1);
+        await fs.writeFile(DATA_FILE, JSON.stringify(messages, null, 2));
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('删除留言失败:', error);
+        res.status(500).json({ error: '删除失败' });
+    }
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
