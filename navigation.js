@@ -482,7 +482,7 @@ const sidebarLinks = document.querySelectorAll('.sidebar a');
 						<div class="message-content">${window.escapeHtml(message.content)}</div>
 						<div class="message-footer">
 							<span>来自IP: ${message.ip}</span>
-							${message.ip === window.getClientIP() ? `<button class="delete-btn" onclick="window.deleteMessage('${message.id}')">删除</button>` : ''}
+							${message.id && message.ip === window.getClientIP() ? `<button class="delete-btn" onclick="window.deleteMessage('${message.id}')">删除</button>` : ''}
 						</div>
 					</div>
 				`;
