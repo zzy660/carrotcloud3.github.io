@@ -45,7 +45,7 @@ exports.handler = async (event, context) => {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: '每个人只能留言一次！您可以删除之前的留言后重新留言。' })
+        body: JSON.stringify({ error: '每个人只能留言一次！' })
       };
     }
 
