@@ -25,26 +25,30 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    console.log('接收到删除请求:', { body: event.body });
+    
     // 在try块开始处添加ID验证和转换
     const { id, ip } = JSON.parse(event.body);
     
     // 验证ID格式
     if (!id || !ip) {
+      console.log('参数验证失败:', { id, ip });
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'ID和IP是必需的参数' })
+        body: JSON.stringify({ error: 'ID和IP是必需的参数', received: { id, ip } })
       };
     }
 
     // 尝试将ID转换为数字（如果数据库使用整数ID）
     const messageId = isNaN(Number(id)) ? id : Number(id);
+    console.log('转换后的ID:', messageId);
     
     // 首先检查这条留言是否存在且IP匹配
     const { data: message, error: fetchError } = await supabase
       .from('guestbook')
       .select('ip')
-      .eq('id', id)
+      .eq('id', messageId)
       .single();
 
     if (fetchError || !message) {
@@ -68,7 +72,7 @@ exports.handler = async (event, context) => {
     const { error: deleteError } = await supabase
       .from('guestbook')
       .delete()
-      .eq('id', id);
+      .eq('id', messageId);
 
     if (deleteError) {
       console.error('Supabase删除错误:', deleteError);
