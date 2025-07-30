@@ -92,37 +92,7 @@ const server = http.createServer(async (req, res) => {
         return;
     }
     
-    if (pathname.startsWith('/api/messages/') && req.method === 'DELETE') {
-        try {
-            const index = parseInt(pathname.split('/')[3]);
-            const body = await readBody(req);
-            const data = JSON.parse(body);
-            
-            const messages = readMessages();
-            
-            if (index < 0 || index >= messages.length) {
-                res.writeHead(404, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: '留言不存在' }));
-                return;
-            }
-            
-            if (messages[index].ip !== data.ip) {
-                res.writeHead(403, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: '无权限删除此留言' }));
-                return;
-            }
-            
-            messages.splice(index, 1);
-            saveMessages(messages);
-            
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ success: true }));
-        } catch (error) {
-            res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: '删除失败' }));
-        }
-        return;
-    }
+
     
     // 静态文件服务
     let filePath = path.join(__dirname, pathname);
