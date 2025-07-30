@@ -494,10 +494,7 @@ const sidebarLinks = document.querySelectorAll('.sidebar a');
 		}
 	};
 
-	// 删除留言功能已禁用，此函数保留但不再使用
-	window.deleteMessage = async function(id) {
-		alert('删除功能已禁用，每人只能提交一次留言');
-	};
+
 
 	// 表单提交事件处理
 	window.submitMessage = async function() {
